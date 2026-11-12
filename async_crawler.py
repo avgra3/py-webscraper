@@ -12,7 +12,6 @@ class AsyncCrawler:
         self.visited: set[str] = set()
         self.lock = asyncio.Lock()
         self.semaphore = asyncio.Semaphore(max_concurrency)
-        self.session = aiohttp.ClientSession()
 
         self.should_stop: bool = False
         self.all_tasks = set()
