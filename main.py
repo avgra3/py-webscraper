@@ -1,23 +1,30 @@
 from scrape import crawl_page
+from async_crawler import AsyncCrawler
 import sys
+import asyncio
 
-def main():
+async def crawl_site_async(base_url: str, max_concurrency: int, max_pages: int):
+    async with AsyncCrawler(base_url=base_url, page_data={}, max_concurrency=max_concurrency, max_pages=max_pages) as crawler:
+        return await crawler.crawl()
+
+async def main():
     args = sys.argv
-    if len(args) < 2:
-        print("no website provided")
+    if len(args) < 4:
+        print("not all arguments given: url max_concurrency max_pages")
         sys.exit(1)
-    if len(args) > 2:
+    if len(args) > 4:
         print("too many arguments provided")
         sys.exit(1)
-    BASE_URL = args[-1]
+    BASE_URL = args[1]
+    MAX_CONCURRENCY = int(args[2])
+    MAX_PAGES = int(args[3])
     print(f"starting crawl of: {BASE_URL}")
-    crawl_data = crawl_page(base_url=BASE_URL, current_url=BASE_URL)
-    number_of_pages = len(crawl_data)
-    print("crawled data", crawl_data)
-    print(f"number of pages scraped: {number_of_pages}")
-    for data in crawl_data:
-        print(data)
+    crawl_data = await crawl_site_async(base_url=BASE_URL, max_concurrency=MAX_CONCURRENCY, max_pages=MAX_PAGES)
+    for url in crawl_data.values():
+        print(url)
+
+
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
