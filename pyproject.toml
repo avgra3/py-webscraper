@@ -1,11 +1,57 @@
 [project]
-name = "python-webscrapper"
-version = "0.1.0"
-description = "Add your description here"
+name = "pyscraper"
+version = "0.1.1"
+description = "A simple web scraper that uses concurrencty to efficiently scape websites."
 readme = "README.md"
 requires-python = ">=3.13"
+authors = [
+    { name = "Antony", email = "antonygradillas@gmail.com" }
+]
+maintainers = [
+    {name = "Antony", email = "antonygradillas@gmail.com"}
+]
 dependencies = [
     "aiohttp==3.12.12",
     "beautifulsoup4==4.13.4",
     "requests==2.32.4",
 ]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+keywords = ["automation", "web-scaper"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/avgra3/py-webscraper"
+Repository = "https://github.com/avgra3/py-webscraper"
+Issues = "https://github.com/avgra3/py-webscraper/issues"
+
+[project.scripts]
+pyscraper = "pyscraper.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+extend-select = ["E501"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.4",
+    "ty>=0.0.101",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+

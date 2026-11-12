@@ -1,11 +1,18 @@
-from crawl import ExtractedPageData, normalize_url, extract_page_data
-from scrape import check_two_urls_same_domain
+from pyscraper.crawl import ExtractedPageData, normalize_url, extract_page_data
+from pyscraper.scrape import check_two_urls_same_domain
 import asyncio
 import aiohttp
-import urllib
+import urllib.parse
+
 
 class AsyncCrawler:
-    def __init__(self, base_url: str, page_data: dict[str, ExtractedPageData], max_concurrency: int, max_pages: int):
+    def __init__(
+        self,
+        base_url: str,
+        page_data: dict[str, ExtractedPageData],
+        max_concurrency: int,
+        max_pages: int,
+    ):
         self.base_url = base_url
         self.base_domain = urllib.parse.urlsplit(self.base_url).netloc
         self.page_data = page_data
@@ -39,7 +46,11 @@ class AsyncCrawler:
             return True
 
     async def get_html(self, url: str):
-        async with self.session.get(url, headers={"User-Agent": "BootCrawler/1.0"}, raise_for_status=True) as resp:
+        async with self.session.get(
+            url,
+            headers={"User-Agent": "BootCrawler/1.0"},
+            raise_for_status=True,
+        ) as resp:
             content_type = resp.headers.get("Content-Type", "")
             assert "text/html" in content_type
             return await resp.text()
@@ -48,7 +59,9 @@ class AsyncCrawler:
         if self.should_stop:
             return
         print(f"trying -> {current_url}, base_url -> {self.base_url}")
-        if not check_two_urls_same_domain(left_url=self.base_url, right_url=current_url):
+        if not check_two_urls_same_domain(
+            left_url=self.base_url, right_url=current_url
+        ):
             return
         norm_current_url = normalize_url(current_url)
         new_page = await self.add_page_visit(normalized_url=norm_current_url)
@@ -64,7 +77,9 @@ class AsyncCrawler:
             background_tasks = set()
             try:
                 for link in extracted_data["outgoing_links"]:
-                    task = asyncio.create_task(self.crawl_page(current_url=link))
+                    task = asyncio.create_task(
+                        self.crawl_page(current_url=link)
+                    )
                     background_tasks.add(task)
                     self.all_tasks.add(task)
             finally:
@@ -75,4 +90,3 @@ class AsyncCrawler:
     async def crawl(self):
         await self.crawl_page(current_url=self.base_url)
         return self.page_data
-

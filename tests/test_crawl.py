@@ -1,9 +1,23 @@
 import unittest
-from crawl import normalize_url, get_heading_from_html, get_first_paragraph_from_html, get_urls_from_html, get_images_from_html, extract_page_data, ExtractedPageData
+from pyscraper.crawl import (
+    normalize_url,
+    get_heading_from_html,
+    get_first_paragraph_from_html,
+    get_urls_from_html,
+    get_images_from_html,
+    extract_page_data,
+    ExtractedPageData,
+)
+
 
 class TestCrawl(unittest.TestCase):
     def test_normalize_url_base(self):
-        inputs = ["https://www.boot.dev/blog/path", "http://www.boot.dev/blog/path", "http://www.boot.dev/blog/path", "www.boot.dev/blog/path"]
+        inputs = [
+            "https://www.boot.dev/blog/path",
+            "http://www.boot.dev/blog/path",
+            "http://www.boot.dev/blog/path",
+            "www.boot.dev/blog/path",
+        ]
         actuals = list(map(normalize_url, inputs))
         expected = "www.boot.dev/blog/path"
         for item in actuals:
@@ -12,7 +26,9 @@ class TestCrawl(unittest.TestCase):
     def test_normalize_url_long(self):
         inputs = "http://www.boot.dev/blog/path/this-is-a-really-long-path-for-some-reason/"
         actual = normalize_url(inputs)
-        expected = "www.boot.dev/blog/path/this-is-a-really-long-path-for-some-reason/"
+        expected = (
+            "www.boot.dev/blog/path/this-is-a-really-long-path-for-some-reason/"
+        )
         self.assertEqual(actual, expected)
 
     def test_normalize_url_partial(self):
@@ -20,7 +36,6 @@ class TestCrawl(unittest.TestCase):
         actual = normalize_url(inputs)
         expected = "www.boot.dev/blog/path"
         self.assertEqual(actual, expected)
-
 
     def test_get_heading_from_html(self):
         input_html_page = """<html>
@@ -109,7 +124,9 @@ class TestCrawl(unittest.TestCase):
 
     def test_get_images_from_html_relative(self):
         input_url = "https://crawler-test.com"
-        input_body = '<html><body><img src="/logo.png" alt="Logo"></body></html>'
+        input_body = (
+            '<html><body><img src="/logo.png" alt="Logo"></body></html>'
+        )
         actual = get_images_from_html(input_body, input_url)
         expected = ["https://crawler-test.com/logo.png"]
         self.assertEqual(actual, expected)
@@ -117,15 +134,24 @@ class TestCrawl(unittest.TestCase):
     def test_get_images_from_html_many(self):
         second_input_url = "https://crawler-test.com"
         second_input_body = '<html><body><img src="/logo.png" alt="Logo"><img src="/second_logo.png" alt="Logo 2"></body></html>'
-        second_actual = get_images_from_html(second_input_body, second_input_url)
-        second_expected = ["https://crawler-test.com/logo.png", "https://crawler-test.com/second_logo.png"]
+        second_actual = get_images_from_html(
+            second_input_body, second_input_url
+        )
+        second_expected = [
+            "https://crawler-test.com/logo.png",
+            "https://crawler-test.com/second_logo.png",
+        ]
         self.assertEqual(second_actual, second_expected)
 
     def test_get_images_from_html_mixed(self):
         third_input_url = "https://crawler-test.com"
         third_input_body = '<html><body><img src="/logo.png" alt="Logo"><img src="/second_logo.png" alt="Logo 2"><img src="https://google.com/third_image.png" alt="Third image"></body></html>'
         third_actual = get_images_from_html(third_input_body, third_input_url)
-        third_expected = ["https://crawler-test.com/logo.png", "https://crawler-test.com/second_logo.png", "https://google.com/third_image.png"]
+        third_expected = [
+            "https://crawler-test.com/logo.png",
+            "https://crawler-test.com/second_logo.png",
+            "https://google.com/third_image.png",
+        ]
         self.assertEqual(third_actual, third_expected)
 
     def test_get_urls_from_html_relative(self):
@@ -139,14 +165,21 @@ class TestCrawl(unittest.TestCase):
         second_input_url = "https://crawler-test.com"
         second_input_body = '<html><body><a href="https://crawler-test.com"><span>Boot.dev</span></a><a href="https://crawler-test2.com"><span>Boot2.dev</span></a><a href="https://crawler-test3.com"><span>Boot3.dev</span></a></body></html>'
         second_actual = get_urls_from_html(second_input_body, second_input_url)
-        second_expected = ["https://crawler-test.com", "https://crawler-test2.com","https://crawler-test3.com"]
+        second_expected = [
+            "https://crawler-test.com",
+            "https://crawler-test2.com",
+            "https://crawler-test3.com",
+        ]
         self.assertEqual(second_actual, second_expected)
 
     def test_get_mix_urls_from_html_relative(self):
         third_input_url = "https://crawler-test.com"
         third_input_body = '<html><body><a href="https://crawler-test.com"><span>Boot.dev</span></a><a href=""><span>Boots.dev</span></a></body></html>'
         third_actual = get_urls_from_html(third_input_body, third_input_url)
-        third_expected = ["https://crawler-test.com", "https://crawler-test.com"]
+        third_expected = [
+            "https://crawler-test.com",
+            "https://crawler-test.com",
+        ]
         self.assertEqual(third_actual, third_expected)
 
     def test_extract_page_data(self):
@@ -164,7 +197,7 @@ class TestCrawl(unittest.TestCase):
             "first_paragraph": "This is the first paragraph.",
             "outgoing_links": ["https://crawler-test.com/link1"],
             "image_urls": ["https://crawler-test.com/image1.jpg"],
-            }
+        }
         self.assertEqual(actual, expected)
 
     def test_extract_page_data_no_data(self):
@@ -178,9 +211,8 @@ class TestCrawl(unittest.TestCase):
             "first_paragraph": "",
             "outgoing_links": [],
             "image_urls": [],
-            }
+        }
         self.assertEqual(actual, expected)
-
 
     def test_extract_page_data_some_data(self):
         input_url = "https://crawler-test.com"
@@ -193,7 +225,7 @@ class TestCrawl(unittest.TestCase):
             "first_paragraph": "",
             "outgoing_links": [],
             "image_urls": [],
-            }
+        }
         self.assertEqual(actual, expected)
 
     def test_extract_page_data_scant_data(self):
@@ -208,10 +240,8 @@ class TestCrawl(unittest.TestCase):
             "first_paragraph": "Outside body tag",
             "outgoing_links": [],
             "image_urls": ["https://crawler-test.com/image1.jpg"],
-            }
+        }
         self.assertEqual(actual, expected)
-
-
 
 
 if __name__ == "__main__":

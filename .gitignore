@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Ignoring output items like json
+report.json
+
+# Ignore notes
+notes/

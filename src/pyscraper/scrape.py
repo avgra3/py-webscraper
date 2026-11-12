@@ -1,6 +1,7 @@
 import requests
-import urllib
-from crawl import ExtractedPageData, normalize_url, extract_page_data
+import urllib.parse
+from pyscraper.crawl import ExtractedPageData, normalize_url, extract_page_data
+
 
 def get_html(url: str) -> str:
     data = requests.get(url, headers={"User-Agent": "BootCrawler/1.0"})
@@ -12,12 +13,18 @@ def get_html(url: str) -> str:
     html = data.text
     return html
 
+
 def check_two_urls_same_domain(left_url: str, right_url: str) -> bool:
     left = urllib.parse.urlsplit(left_url)
-    right= urllib.parse.urlsplit(right_url)
+    right = urllib.parse.urlsplit(right_url)
     return left.netloc == right.netloc
 
-def crawl_page(base_url: str, current_url: str, page_data: dict[str, ExtractedPageData] = {}) -> dict[str, ExtractedPageData]:
+
+def crawl_page(
+    base_url: str,
+    current_url: str,
+    page_data: dict[str, ExtractedPageData] = {},
+) -> dict[str, ExtractedPageData]:
     print("current url:", current_url)
     # base_url: root URL of the website we're crawling
     # current_url: current URL we're crawling
@@ -38,7 +45,9 @@ def crawl_page(base_url: str, current_url: str, page_data: dict[str, ExtractedPa
     html: str = get_html(url=current_url)
 
     # 05 => extract page data and add result to page_data
-    extracted_data: ExtractedPageData = extract_page_data(html=html, page_url=current_url)
+    extracted_data: ExtractedPageData = extract_page_data(
+        html=html, page_url=current_url
+    )
     page_data[norm_url] = extracted_data
 
     # 06 => use outgoing links for what to crawl next
